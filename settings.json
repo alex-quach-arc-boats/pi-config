@@ -22,7 +22,7 @@
     {
       "source": "/home/alex/github/pi-subagents",
       "extensions": [
-        "dist-pkg/index.js"
+        "index.ts"
       ],
       "skills": [],
       "prompts": []
