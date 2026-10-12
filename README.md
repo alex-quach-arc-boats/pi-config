@@ -20,6 +20,12 @@ export OPENCODE_CONFIG=/home/alex/github/quach-harness/opencode.json
 
 Opencode merges configs with what's in ~/.config/opencode, so anything there may still alter your experience. Clear out that directory of skills and agents if you want to only use what's here.
 
+## Background jobs
+
+`.opencode/tools/jobs.ts` adds two tools for running prompts as asynchronous, process-isolated jobs. `jobs_spawn` takes a prompt and starts a detached `opencode run` process, returning a job id immediately. `jobs_status` with no id lists the jobs spawned from the current directory, and with an id reports the job's state (running, succeeded, failed, or lost), its token usage and session id, and the text of its final answer. A failed job also reports its exit code, any provider error, and the tail of stderr.
+
+Each job lives in its own directory under `~/.local/state/opencode-jobs/<id>/`, holding a write-once `job.json`, the prompt, the raw `--format json` event stream, stderr, and an `exit` file. State is derived from that directory rather than from a mutable status field, so a job whose wrapper dies without writing an exit code reads as lost rather than running forever. Jobs run with permissions auto-approved and explicit denies still enforced, they use the harness agents in whatever directory they were spawned from, and they refuse to spawn further jobs.
+
 ## Motivation
 
 I've been using codebuff for over a year, but recently became dissatisfied with its performance when it moved its main models to Opus 5. When this happened, it cranked up the AI speak to 12/10, slowed down responses and caused extra overthinking, which wasted a lot of time.
