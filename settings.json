@@ -20,14 +20,15 @@
   ],
   "packages": [
     {
-      "source": "npm:pi-subagents@0.77.0",
+      "source": "/home/alex/github/pi-subagents/dist-pkg",
       "extensions": [
         "index.js"
       ],
       "skills": [],
       "prompts": []
     },
-    "npm:pi-zentui"
+    "npm:pi-zentui",
+    "npm:pi-collapse-tools"
   ],
   "subagents": {
     "disableBuiltins": true
@@ -48,5 +49,6 @@
   "doubleEscapeAction": "tree",
   "terminal": {
     "showTerminalProgress": true
-  }
+  },
+  "fullscreenExitOutput": "resume-hint"
 }
