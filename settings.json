@@ -20,9 +20,9 @@
   ],
   "packages": [
     {
-      "source": "/home/alex/github/pi-subagents/dist-pkg",
+      "source": "/home/alex/github/pi-subagents",
       "extensions": [
-        "index.js"
+        "dist-pkg/index.js"
       ],
       "skills": [],
       "prompts": []
