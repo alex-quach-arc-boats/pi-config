@@ -1,62 +1,98 @@
-# quach-harness
+# Pi harness config
 
-An [opencode](https://opencode.ai) agent harness. It disables the built-in agents named in `opencode.json` and defines four custom agents that handle coordination, analysis, implementation, and review, and it ships a documentation skill that keeps agent prose tight.
+A self-contained Pi agent directory that mirrors the OpenCode harness in `quach-harness` and the user config in `dotfiles`. Delegation runs on the pinned `pi-subagents` package and the local extension only handles the primary prompt, the user-input suffix, and the shared path guard.
 
-## Agents and models
+## Setup
 
-- `primary` on `opencode-go/gpt-6-luna` orchestrates and delegates to subagents.
-- `deep-thinker` on `opencode/claude-opus-5.5` gives slow, complex analysis.
-- `doer` on `opencode-go/glm-5.3-flash` implements one clearly bounded task.
-- `reviewer` on `opencode/gpt-6-sol` reviews changes.
+Install current Pi from pi.dev first. Pi requires Node.js 22.19 or newer. Then install the pinned dependency declared in `settings.json`.
 
-## How to use
-
-Check out this repo, then add this to your shell (with the correct path):
-
-```
-export OPENCODE_CONFIG_DIR=/home/alex/github/quach-harness/.opencode
-export OPENCODE_CONFIG=/home/alex/github/quach-harness/opencode.json
+```sh
+PI_CODING_AGENT_DIR=/home/alex/github/pi-config pi update --extensions
 ```
 
-Opencode merges configs with what's in ~/.config/opencode, so anything there may still alter your experience. Clear out that directory of skills and agents if you want to only use what's here.
+This places `pi-subagents@0.77.0` under `npm/` (git-ignored) without touching the tracked configuration. Restart Pi after the install completes because `/reload` re-runs extensions but a freshly installed dependency is not picked up until a new process loads it.
 
-## Background jobs
+## Launch
 
-`.opencode/tools/jobs.ts` adds two tools for running prompts as asynchronous, process-isolated jobs. `jobs_spawn` takes a prompt and starts a detached `opencode run` process, returning a job id immediately. `jobs_status` with no id lists the jobs spawned from the current directory, and with an id reports the job's state (running, succeeded, failed, or lost), its token usage and session id, and the text of its final answer. A failed job also reports its exit code, any provider error, and the tail of stderr.
+```sh
+PI_CODING_AGENT_DIR=/home/alex/github/pi-config pi
+```
 
-Each job lives in its own directory under `~/.local/state/opencode-jobs/<id>/`, holding a write-once `job.json`, the prompt, the raw `--format json` event stream, stderr, and an `exit` file. State is derived from that directory rather than from a mutable status field, so a job whose wrapper dies without writing an exit code reads as lost rather than running forever. Jobs run with permissions auto-approved and explicit denies still enforced, they use the harness agents in whatever directory they were spawned from, and they refuse to spawn further jobs.
+Launch from any project. Pi reads `settings.json`, `models.json`, `agents/`, `skills/`, `lib/`, and `extensions/harness.ts` from that directory for this process and all children. The subagent package reads its own config from `extensions/subagent/config.json` in the same agent directory. `auth.json`, `sessions/`, `models-store.json`, and `npm/` are ignored by the included `.gitignore`.
 
-## Motivation
+## Roles
 
-I've been using codebuff for over a year, but recently became dissatisfied with its performance when it moved its main models to Opus 5. When this happened, it cranked up the AI speak to 12/10, slowed down responses and caused extra overthinking, which wasted a lot of time.
+The package catalog advertises exactly the four configured agents. Built-in package agents are disabled through `subagents.disableBuiltins` and the primary is not a subagent. Its `agents/primary.md` file is body-only, so the package parser (which requires frontmatter `name` and `description`) skips it.
 
-Codebuff also seems more niche, so I felt less comfortable using it for the long term, especially as it falls behind other harnesses for things like session forking and moving sessions between directories. As such, I started looking for a new harness and settled on opencode as a good balance between batteries included and customizability.
+| Agent | Model | Tools |
+|---|---|---|
+| thinker | opencode/claude-opus-5-5 | read, grep, find, ls, git |
+| doer | isoquant/glm-5.3-flash (thinking max) | read, bash, edit, write, grep, find, ls |
+| reviewer | opencode/gpt-6.1-sol | read, grep, find, ls, git |
+| ui-designer | opencode/gpt-5.6-terra | read, grep, find, ls |
 
-For some reason, I'm more skeptical of the major ones like Codex and Claude Code because they vertically integrate with the models themselves. This probably leads to better performance because they probably spent a lot more time tuning them. However, it also feels like a conflict of interest because they want you to burn a lot of tokens, because that's how they make money.
+Descriptions reuse the original harness agent definitions. Launch natively, for example `subagent({ agent: "thinker", task: "..." })`. With workflow scripts disabled, `tasks: [{ agent, task }, ...]` still runs children in parallel and returns their results in order.
 
-### Non Anthropic/OpenAI models
+Children run foreground (`asyncByDefault: false`) with fresh context (`defaultSubagentContext: fresh`, depth 1). Each agent file opts explicitly into `systemPromptMode: append` plus project context, global context, and the discovered skills catalog, so every inherited context is a declared frontmatter choice rather than a default. Nested delegation is blocked (`allowNestedSubagents: false`). The `doer` declares `thinking: max` in its frontmatter, matching the model-level pin in `settings.json`.
 
-After starting on opencode with just Opus 4.8, it burned quite a lot of money and was a bit slow. Some of the Chinese models, which codebuff used to use in its `lite` mode, were pretty strong, providing a nice balance between being fast, efficient, and smart. Using those cut down the cost by quite a bit. My favorite one, although I haven't used them all, is GLM 5.2.
+The primary prompt routes work to `thinker`, `doer`, and `reviewer` by name, so no change to the copied prompt body was needed for the switch.
 
-### Delegation/subagents
+## Missions are off
 
-Using that one gave pretty good results; however, I still wanted to optimize it a little more because having one agent do everything tends to pollute your context window. This, in turn, increases cost and time. Every time your agent does something or returns to you for more information, the entire context window is posted back to the agent, creating an N^2 situation where, if your agent is incredibly verbose and overthinks, it will spam the context window with extra thoughts that will get reposted to it over and over, taking up more time and dollars.
+Missions stay off through `disabledFeatures` and `missions.enabled: false` in `extensions/subagent/config.json`, and subagent tool calls render as summaries through `inlineToolDisplay: "summary"`.
 
-Sub-agents solve this by allowing agents to delegate, sort of like a function call, because the new agent gets an entirely fresh context window with only a little bit of context injected into it from the parent agent, like function arguments. After it finishes thinking, it returns only its conclusion back to the parent agent, thus protecting the parent agent's context. Another benefit is that the sub-agent can use a different model, which can be helpful if you want to do something with more or less thought than the standard parent model. 
+## Parent prompt handling
 
-The downside of sub-agents is that excessive calling of sub-agents slows down the overall work that gets done, in the same way that excessive delegation in human space slows down getting things done. It's important to only delegate when there are clear performance improvements or cost savings to be had. I tried [oh-my-opencode-slim](https://github.com/alvinunreal/oh-my-opencode-slim), a popular opencode plugin with several agents, and found that it was impressively cheap, but even simple PRs took 20 to 30 minutes. For the same performance, there's a time vs cost tradeoff. You could potentially have one model bang out a PR with zero delegation, which would be faster but more expensive.
+`extensions/harness.ts` appends `agents/primary.md` to the parent system prompt on every primary run, with two paths.
 
-### Time vs cost
+- Normal runs write the primary text into the structured prompt's `primary` section and return no full-prompt override. Sections that later handlers add, such as the `advertised_subagents` catalog, therefore stay visible to the model instead of being folded away by a forced prompt.
+- When another handler already forced a complete prompt, or when the event carries only a rendered prompt, the hook appends the primary text to `event.systemPrompt` explicitly, so the instructions also apply on override paths.
 
-The base cost of an engineer is so high that it's probably not worth it to try to squeeze every dollar trying to make your AI prompting as efficient as possible. However, it's still important to 80/20 so that you don't blow $100 on every small PR. The sweet spot is probably a little delegation, but not too much.
+After changing the extension or the primary prompt, run `/reload` in Pi. Launch with `PI_CODING_AGENT_DIR` set as shown above because Pi does not treat this repository's root as its agent directory just because it is the working directory.
 
-Time, aka latency, is also an interesting tradeoff, because it depends on how urgently you need the work to get done. If you're writing some big prompts to run overnight, it doesn't matter if it takes an hour or five because you'll be sleeping through it, and you can scale up throughput if you run multiple agents. 
+## Child-only extension and guards
 
-However, the mindset of needing to come back later for even minor changes does increase friction, because it's nice to have AI handle a small PR in under five minutes, which doesn't require you to mentally classify it as a long-running background task. It may be less mental overhead to hash out five quick PRs in serial than figure out how to parallelize them all slowly.
+`lib/child.ts` is the only extension children load. Every agent file lists it explicitly, which also keeps ambient extensions out of children. It registers the path guard and a read-only `git` tool with fixed `status`, `diff`, and `log` views, the combined staged and unstaged diff against HEAD with separate index and working-tree comparisons in repositories without commits, UTF-8 output capped with explicit truncation notices, and cancellation listener cleanup. The parent imports `registerPathGuard` from the same module. The package's strict tool allowlist exposes `git` only to the roles that list it.
 
-## Summary
+The guard blocks `~/.aws` for every role's read, write, edit, grep, find, and ls calls and for the git tool's directory. Listing or searching rooted at `~/github` itself is blocked for grep, find, and ls, while project subdirectories under `~/github` stay readable. Paths expand `~`, resolve relative paths against the working directory, and resolve symlinks through the real path of the existing target or the nearest existing ancestor for writes.
 
-- Primary is GPT-6-Luna for coordination and delegation.
-* Delegates to the Deep Thinker Opus 5.5 for stuff that you actually want to spend a lot of time analyzing.
-* Delegates to the Doer GLM-5.3-Flash to protect the context window.
-* Delegates to the Reviewer GPT-6-Sol for review.
+These checks are best-effort tool guards and not a sandbox. Bash remains unrestricted for the primary and the doer, and a shell command can bypass every guard. Project repositories can add trusted agent definitions through the package's discovery scopes, and loading them is a trust decision, not a security boundary. The Hunk review skill requires shell access, so it cannot function in read-only roles. Active runs are visible in the package's FleetView instead of a custom status counter.
+
+## Files
+
+```
+settings.json                      defaults, tool selection, thinking levels, builtin extension exclusions, pinned package, builtins disable
+models.json                        isoquant provider (with GLM developer-role compat pin) and GovCloud Bedrock model
+agents/                            primary body plus four subagent definitions with model/tools frontmatter
+skills/                            brand-guidelines, good-documentation, hunk-review, ux-intake
+extensions/subagent/config.json    tool activation eager, foreground children, fresh context, depth 1, schedules off, missions off, intercom off
+lib/child.ts                       path guard and readonly git tool (child extension)
+extensions/harness.ts              primary prompt hook, input suffix, guard registration
+test/                              VM-based tests for guard, git, and parent prompt handling plus the loopback serialization test
+```
+
+The pinned package's skills and prompts are excluded in the `settings.json` package entry, so only the tracked `skills/` directory applies. Built-in MCP, codemode, and tool search stay disabled through resource exclusions. The provider details for `opencode` and the `isoquant` endpoint, the `Isoquant-ZDR: required` header, and the GovCloud Bedrock entry are otherwise unchanged. `models.json` carries the catalog values, and authentication uses the matching API keys or `/login`.
+
+## GLM instruction role
+
+`models.json` pins `compat.supportsDeveloperRole: false` on the `isoquant/glm-5.3-flash` entry. The exported session shows every instruction section reaching the prompt, so instruction loading worked as designed. For a reasoning model whose provider Pi does not recognize, the outgoing instructions carried the `developer` role, and the pin makes the corrected model send `system`. Whether the server needs `system` or mishandles `developer`, and how it complies with either role, stays unverified here.
+
+Instruction sources update on different clocks. The primary hook rereads `agents/primary.md` on every run, so primary edits land on the next turn, while native `AGENTS.md` and skills caches refresh only on `/reload`. Sessions record their own model, one started on GLM stays on GLM until `/model` changes it, and the configured startup default stays whatever the user chose.
+
+## Tests
+
+Run the suite without installing anything.
+
+```sh
+node --experimental-vm-modules /home/alex/github/pi-config/test/harness.test.mjs
+```
+
+The suite loads the real `lib/child.ts` and `extensions/harness.ts` sources into a VM with mocked framework imports and covers the path guard against symlink fixtures, the git tool against real temporary repositories, and the parent prompt paths including the catalog-composition case. It does not load the installed package, launch Pi, or call a model.
+
+The loopback test is separate. It launches the real Pi binary against a local HTTP server and sends no requests to real models or installed folders. It needs a Pi install reachable through `PATH` or through `PI_BINARY` set to a command or path.
+
+```sh
+node /home/alex/github/pi-config/test/isoquant-system-prompt.test.mjs
+```
+
+It asserts the role of the first outbound message plus the survival of the primary and AGENTS fixture text. With `--baseline` it builds the same fixture with the compat pin stripped and prints the observed role instead of asserting it.

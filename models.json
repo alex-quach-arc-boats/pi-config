@@ -1,0 +1,56 @@
+{
+  "providers": {
+    "isoquant": {
+      "name": "Isoquant",
+      "baseUrl": "https://api.isoquant.ai/v1",
+      "api": "openai-completions",
+      "apiKey": "$ISOQUANT_API_KEY",
+      "headers": {
+        "Isoquant-ZDR": "required"
+      },
+      "models": [
+        {
+          "id": "glm-5.3-flash",
+          "name": "GLM 5.3 Flash",
+          "reasoning": true,
+          "contextWindow": 1048576,
+          "maxTokens": 128000,
+          "compat": {
+            "supportsDeveloperRole": false
+          },
+          "thinkingLevelMap": {
+            "max": "max"
+          }
+        }
+      ]
+    },
+    "amazon-bedrock": {
+      "models": [
+        {
+          "id": "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "name": "Claude Sonnet 4.5 GovCloud",
+          "api": "bedrock-converse-stream",
+          "baseUrl": "https://bedrock-runtime.us-east-1.amazonaws.com",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 200000,
+          "maxTokens": 64000,
+          "inputLimits": {
+            "images": {
+              "maxPerMessage": 20,
+              "resize": {
+                "maxWidth": 2000,
+                "maxHeight": 2000,
+                "maxBytes": 4718592,
+                "jpegQuality": 80
+              }
+            }
+          },
+          "compat": {
+            "supportsStrictMode": true
+          }
+        }
+      ]
+    }
+  }
+}

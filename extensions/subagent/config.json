@@ -1,0 +1,31 @@
+{
+  "toolActivation": "eager",
+  "asyncByDefault": false,
+  "defaultSubagentContext": "fresh",
+  "maxSubagentDepth": 1,
+  "disabledFeatures": [
+    "agent-management",
+    "workflow-scripts",
+    "missions",
+    "lane-management",
+    "lane-metadata",
+    "external-machines",
+    "extension-bindings",
+    "preflight",
+    "watchdog",
+    "usage-budgets",
+    "tool-budgets",
+    "spawn-budget-grants",
+    "control-overrides"
+  ],
+  "inlineToolDisplay": "summary",
+  "missions": {
+    "enabled": false
+  },
+  "scheduledRuns": {
+    "enabled": false
+  },
+  "intercomBridge": {
+    "mode": "off"
+  }
+}

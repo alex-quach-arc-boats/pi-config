@@ -1,0 +1,52 @@
+{
+  "defaultProvider": "isoquant",
+  "defaultModel": "glm-5.3-flash",
+  "defaultTools": [
+    "read",
+    "bash",
+    "edit",
+    "write",
+    "grep",
+    "find",
+    "ls"
+  ],
+  "modelThinkingLevels": {
+    "isoquant/glm-5.3-flash": "max"
+  },
+  "extensions": [
+    "-builtin:mcp",
+    "-builtin:codemode",
+    "-builtin:tool-search"
+  ],
+  "packages": [
+    {
+      "source": "npm:pi-subagents@0.77.0",
+      "extensions": [
+        "index.js"
+      ],
+      "skills": [],
+      "prompts": []
+    },
+    "npm:pi-zentui"
+  ],
+  "subagents": {
+    "disableBuiltins": true
+  },
+  "lastChangelogVersion": "1.1.0",
+  "hideThinkingBlock": true,
+  "quietStartup": false,
+  "collapseChangelog": true,
+  "enableInstallTelemetry": false,
+  "theme": "system",
+  "enabledModels": [
+    "opencode/gpt-6-luna",
+    "isoquant/glm-5.3-flash",
+    "opencode/gpt-6.1-sol"
+  ],
+  "steeringMode": "all",
+  "followUpMode": "all",
+  "doubleEscapeAction": "tree",
+  "terminal": {
+    "showTerminalProgress": true
+  }
+}

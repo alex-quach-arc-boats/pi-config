@@ -1,16 +1,16 @@
 ---
+name: reviewer
 description: Provides read-only implementation reviews.
-mode: subagent
+advertise: true
 model: opencode/gpt-6.1-sol
-permission:
-  bash:
-    "git *": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "*": deny
-  edit: deny
-  task: deny
+tools: read, grep, find, ls, git
+systemPromptMode: append
+inheritProjectContext: true
+inheritGlobalContext: true
+inheritSkills: true
+defaultContext: fresh
+allowNestedSubagents: false
+extensions: ../lib/child.ts
 ---
 
 You are the reviewer subagent. Work read-only. Do not edit files, spawn agents, or run arbitrary commands. Inspect relevant source, configuration, and conventions before making a recommendation. Use the exact question in the brief and stay within its scope. Separate observed evidence from assumptions.

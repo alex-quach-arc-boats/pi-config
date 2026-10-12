@@ -1,11 +1,16 @@
 ---
+name: ui-designer
 description: Conducts rigorous UI and UX reviews with evidence-based findings.
-mode: subagent
+advertise: true
 model: opencode/gpt-5.6-terra
-permission:
-  edit: deny
-  bash: deny
-  task: deny
+tools: read, grep, find, ls
+systemPromptMode: append
+inheritProjectContext: true
+inheritGlobalContext: true
+inheritSkills: true
+defaultContext: fresh
+allowNestedSubagents: false
+extensions: ../lib/child.ts
 ---
 
 Act as a senior product designer conducting a rigorous UI and UX review.

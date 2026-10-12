@@ -1,0 +1,163 @@
+{
+  "components": {
+    "editor": {
+      "enabled": true,
+      "style": "minimalist",
+      "codexQuota": false,
+      "colorSource": "theme",
+      "borderColorMode": "static",
+      "modelLabel": "name",
+      "viewportIndicators": true,
+      "styles": {
+        "opencode": {
+          "metadataFormat": "$model  $provider(  $thinking)(  $fast_mode)(  $codex_quota)",
+          "completionMenu": "palette"
+        },
+        "opencode-copy-friendly": {
+          "metadataFormat": "$model  $provider(  $thinking)(  $fast_mode)(  $codex_quota)",
+          "completionMenu": "palette"
+        },
+        "accent-rail": {
+          "rail": "▎",
+          "asciiRail": "|",
+          "transparent": false
+        },
+        "minimalist": {
+          "pathDisplay": "full",
+          "contextFormat": "percent-total",
+          "contextGauge": false,
+          "showSessionName": false,
+          "showTimer": true,
+          "showCost": true,
+          "showCacheHit": false,
+          "showGit": true,
+          "contextThresholds": {
+            "warning": 70,
+            "error": 90
+          },
+          "separator": "dash"
+        }
+      }
+    },
+    "footer": {
+      "style": "hidden",
+      "codexQuota": false,
+      "colorSource": "theme",
+      "modelLabel": "id",
+      "styles": {
+        "starship": {
+          "format": "",
+          "responsive": true,
+          "compactFormat": "$cwd$wrap(in $session_name)$wrap(on $git_branch) $git_status$wrap$context$wrap_sep$tokens$wrap_sep($codex_quota)",
+          "compactMaxLines": 2,
+          "separator": "pipe",
+          "contextStyle": "text",
+          "contextThresholds": {
+            "warning": 70,
+            "error": 90
+          },
+          "pathDisplay": {
+            "mode": "basename",
+            "depth": 0
+          },
+          "segments": {
+            "cwd": true,
+            "sessionName": true,
+            "gitBranch": true,
+            "gitStatus": true,
+            "gitCounts": false,
+            "gitCommit": false,
+            "gitMetrics": false,
+            "runtime": true,
+            "modelInfo": false,
+            "context": true,
+            "tokens": true,
+            "cost": true,
+            "sessionDuration": false,
+            "username": false,
+            "time": false,
+            "os": false,
+            "packageVersion": false
+          },
+          "gitBranch": {
+            "maxLength": "full"
+          },
+          "gitCommit": {
+            "hashLength": 7,
+            "onlyDetached": true,
+            "showTag": true
+          },
+          "gitMetrics": {
+            "onlyNonzero": true,
+            "ignoreSubmodules": false
+          },
+          "extensionStatuses": {
+            "defaultPlacement": "right",
+            "placements": {},
+            "colorModes": {}
+          }
+        }
+      }
+    },
+    "userMessages": {
+      "enabled": false,
+      "style": "compact",
+      "colorSource": "theme",
+      "styles": {
+        "framed": {},
+        "framed-copy-friendly": {},
+        "compact": {},
+        "labeled": {}
+      }
+    },
+    "selectorBorders": {
+      "enabled": true,
+      "style": "zentui",
+      "colorSource": "theme"
+    },
+    "thinkingSteps": {
+      "enabled": false,
+      "mode": "tree"
+    },
+    "workingLine": {
+      "enabled": false,
+      "turnSummary": true,
+      "turnSummaryFormat": "Turn took $turn_duration$join_sep(thought for $thought_duration)$join_sep(↑$input_tokens ↓$output_tokens)$join_sep$token_rate",
+      "spinner": "star-bloom",
+      "spinnerIntervalMs": 100,
+      "animateSpinnerColor": false,
+      "textIntervalMs": 60,
+      "textAnimation": "classic",
+      "placement": "above",
+      "colorSource": "theme",
+      "messages": {
+        "custom": true,
+        "values": [
+          "Sautéing…",
+          "Cooking…",
+          "Ionizing…",
+          "Zigzagging…",
+          "Razzle-dazzling…",
+          "Photosynthesizing…",
+          "Nucleating…",
+          "Brewing…",
+          "Combobulating…",
+          "Boogieing…",
+          "Befuddling…",
+          "Alchemizing…",
+          "Conjuring…",
+          "Baking…",
+          "Simmering…",
+          "Blanching…"
+        ]
+      },
+      "segments": {
+        "tokenRate": false,
+        "tool": true,
+        "elapsed": true,
+        "thought": true,
+        "tokens": true
+      }
+    }
+  }
+}
