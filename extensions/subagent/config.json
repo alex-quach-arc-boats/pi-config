@@ -1,6 +1,6 @@
 {
   "toolActivation": "eager",
-  "asyncByDefault": false,
+  "asyncByDefault": true,
   "defaultSubagentContext": "fresh",
   "maxSubagentDepth": 1,
   "disabledFeatures": [
