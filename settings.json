@@ -38,7 +38,7 @@
   "quietStartup": false,
   "collapseChangelog": true,
   "enableInstallTelemetry": false,
-  "theme": "system",
+  "theme": "tomorrow-night",
   "enabledModels": [
     "opencode/gpt-6-luna",
     "isoquant/glm-5.3-flash",
