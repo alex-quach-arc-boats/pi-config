@@ -27,7 +27,7 @@
           "contextFormat": "percent-total",
           "formats": {
             "topRight": "$cost$sep$model [$provider]$sep$thinking$sep$context",
-            "bottomLeft": "$cwd [$git_branch $git_status]",
+            "bottomLeft": "$cwd ([$git_branch $git_status])",
             "bottomRight": ""
           },
           "contextGauge": false,
