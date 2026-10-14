@@ -53,6 +53,7 @@
   },
   "fullscreenExitOutput": "resume-hint",
   "editorPaddingX": 1,
+  "editorPaddingY": 1,
   "outputPad": 1,
   "compaction": {
     "enabled": true
