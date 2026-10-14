@@ -2,7 +2,7 @@
   "components": {
     "editor": {
       "enabled": true,
-      "style": "minimalist",
+      "style": "opencode",
       "codexQuota": false,
       "colorSource": "theme",
       "borderColorMode": "static",
@@ -26,9 +26,9 @@
           "pathDisplay": "full",
           "contextFormat": "percent-total",
           "formats": {
-            "topRight": "$cost$sep$model [$provider]$sep$thinking$sep$context",
-            "bottomLeft": "$cwd ([$git_branch $git_status])",
-            "bottomRight": ""
+            "bottomLeft": "       $model [$provider]$sep$thinking",
+            "bottomRight": "$cost$sep$context",
+            "topRight": "$cwd ([$git_branch $git_status])"
           },
           "contextGauge": false,
           "showSessionName": false,
@@ -45,7 +45,7 @@
       }
     },
     "footer": {
-      "style": "hidden",
+      "style": "starship",
       "codexQuota": false,
       "colorSource": "theme",
       "modelLabel": "id",
@@ -62,21 +62,21 @@
             "error": 90
           },
           "pathDisplay": {
-            "mode": "basename",
+            "mode": "full",
             "depth": 0
           },
           "segments": {
             "cwd": true,
             "sessionName": true,
             "gitBranch": true,
-            "gitStatus": true,
+            "gitStatus": false,
             "gitCounts": false,
             "gitCommit": false,
             "gitMetrics": false,
-            "runtime": true,
+            "runtime": false,
             "modelInfo": false,
             "context": true,
-            "tokens": true,
+            "tokens": false,
             "cost": true,
             "sessionDuration": false,
             "username": false,
