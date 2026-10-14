@@ -1,6 +1,7 @@
 {
   "toolActivation": "eager",
   "asyncByDefault": true,
+  "timeoutMs": 3600000,
   "defaultSubagentContext": "fresh",
   "maxSubagentDepth": 1,
   "disabledFeatures": [

@@ -11,7 +11,8 @@
     "ls"
   ],
   "modelThinkingLevels": {
-    "isoquant/glm-5.3-flash": "max"
+    "isoquant/glm-5.3-flash": "max",
+    "opencode/gpt-6.1-sol": "medium"
   },
   "extensions": [
     "-builtin:mcp",
@@ -27,8 +28,8 @@
       "skills": [],
       "prompts": []
     },
-    "npm:pi-zentui",
-    "npm:pi-collapse-tools"
+    "npm:pi-zentui@0.30.0",
+    "npm:pi-collapse-tools@0.1.11"
   ],
   "subagents": {
     "disableBuiltins": true
@@ -40,6 +41,7 @@
   "enableInstallTelemetry": false,
   "theme": "tomorrow-night",
   "enabledModels": [
+    "opencode/glm-5.3-flash",
     "opencode/gpt-6-luna",
     "isoquant/glm-5.3-flash",
     "opencode/gpt-6.1-sol"
@@ -48,7 +50,14 @@
   "followUpMode": "all",
   "doubleEscapeAction": "tree",
   "terminal": {
-    "showTerminalProgress": true
+    "showTerminalProgress": false
   },
-  "fullscreenExitOutput": "resume-hint"
+  "fullscreenExitOutput": "resume-hint",
+  "editorPaddingX": 1,
+  "outputPad": 1,
+  "compaction": {
+    "enabled": true
+  },
+  "treeFilterMode": "default",
+  "tuiMode": "fullscreen"
 }
