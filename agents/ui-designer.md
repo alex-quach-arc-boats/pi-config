@@ -2,7 +2,7 @@
 name: ui-designer
 description: Conducts rigorous UI and UX reviews with evidence-based findings.
 advertise: true
-model: opencode/gpt-5.6-terra
+model: openrouter/openai/gpt-5.6-terra
 tools: read, grep, find, ls
 systemPromptMode: append
 inheritProjectContext: true

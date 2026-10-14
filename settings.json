@@ -12,7 +12,7 @@
   ],
   "modelThinkingLevels": {
     "isoquant/glm-5.3-flash": "max",
-    "opencode/gpt-6.1-sol": "medium"
+    "openrouter/openai/gpt-6.1-sol": "medium"
   },
   "extensions": [
     "-builtin:mcp",

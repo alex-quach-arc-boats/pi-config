@@ -2,7 +2,7 @@
 name: reviewer
 description: Provides read-only implementation reviews.
 advertise: true
-model: opencode/gpt-6.1-sol
+model: openrouter/openai/gpt-6.1-sol
 tools: read, grep, find, ls, git
 systemPromptMode: append
 inheritProjectContext: true

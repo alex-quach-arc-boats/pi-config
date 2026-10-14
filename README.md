@@ -26,10 +26,10 @@ The package catalog advertises exactly the four configured agents. Built-in pack
 
 | Agent | Model | Tools |
 |---|---|---|
-| thinker | opencode/claude-opus-5-5 | read, grep, find, ls, git |
+| thinker | openrouter/anthropic/claude-opus-5.5 | read, grep, find, ls, git |
 | doer | isoquant/glm-5.3-flash (thinking max) | read, bash, edit, write, grep, find, ls |
-| reviewer | opencode/gpt-6.1-sol | read, grep, find, ls, git |
-| ui-designer | opencode/gpt-5.6-terra | read, grep, find, ls |
+| reviewer | openrouter/openai/gpt-6.1-sol | read, grep, find, ls, git |
+| ui-designer | openrouter/openai/gpt-5.6-terra | read, grep, find, ls |
 
 Descriptions reuse the original harness agent definitions. Launch natively, for example `subagent({ agent: "thinker", task: "..." })`. With workflow scripts disabled, `tasks: [{ agent, task }, ...]` still runs children in parallel and returns their results in order.
 
@@ -71,7 +71,7 @@ extensions/harness.ts              primary prompt hook, input suffix, guard regi
 test/                              VM-based tests for guard, git, and parent prompt handling plus the loopback serialization test
 ```
 
-The pinned package's skills and prompts are excluded in the `settings.json` package entry, so only the tracked `skills/` directory applies. Built-in MCP, codemode, and tool search stay disabled through resource exclusions. The provider details for `opencode` and the `isoquant` endpoint, the `Isoquant-ZDR: required` header, and the GovCloud Bedrock entry are otherwise unchanged. `models.json` carries the catalog values, and authentication uses the matching API keys or `/login`.
+The pinned package's skills and prompts are excluded in the `settings.json` package entry, so only the tracked `skills/` directory applies. Built-in MCP, codemode, and tool search stay disabled through resource exclusions. The provider details for `openrouter` and the `isoquant` endpoint, the `Isoquant-ZDR: required` header, and the GovCloud Bedrock entry are otherwise unchanged. `models.json` carries the catalog values, and authentication uses the matching API keys or `/login`.
 
 ## GLM instruction role
 

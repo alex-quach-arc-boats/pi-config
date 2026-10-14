@@ -2,7 +2,7 @@
 name: thinker
 description: Provides read-only source analysis, decisions, and implementation reviews.
 advertise: true
-model: opencode/claude-opus-5-5
+model: openrouter/anthropic/claude-opus-5.5
 tools: read, grep, find, ls, git
 systemPromptMode: append
 inheritProjectContext: true
