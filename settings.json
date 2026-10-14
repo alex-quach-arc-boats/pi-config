@@ -41,10 +41,9 @@
   "enableInstallTelemetry": false,
   "theme": "tomorrow-night",
   "enabledModels": [
-    "opencode/glm-5.3-flash",
-    "opencode/gpt-6-luna",
     "isoquant/glm-5.3-flash",
-    "opencode/gpt-6.1-sol"
+    "openrouter/openai/gpt-6.1-sol",
+    "openrouter/openai/gpt-6-luna"
   ],
   "steeringMode": "all",
   "followUpMode": "all",
