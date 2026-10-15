@@ -56,7 +56,8 @@
   "editorPaddingY": 1,
   "outputPad": 1,
   "compaction": {
-    "enabled": true
+    "enabled": true,
+    "reserveTokens": 200000
   },
   "treeFilterMode": "default",
   "tuiMode": "fullscreen"
