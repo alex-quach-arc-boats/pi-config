@@ -1,6 +1,6 @@
 # Pi harness config
 
-A self-contained Pi agent directory that mirrors the OpenCode harness in `quach-harness` and the user config in `dotfiles`. Delegation runs on the pinned `pi-subagents` package and the local extension only handles the primary prompt, the user-input suffix, and the shared path guard.
+A self-contained Pi agent directory that mirrors the OpenCode harness in `quach-harness` and the user config in `dotfiles`. Delegation runs on the pinned `pi-subagents` package and the local extension only handles the primary prompt and the user-input suffix.
 
 ## Setup
 
@@ -18,7 +18,7 @@ This places `pi-subagents@0.77.0` under `npm/` (git-ignored) without touching th
 PI_CODING_AGENT_DIR=/home/alex/github/pi-config pi
 ```
 
-Launch from any project. Pi reads `settings.json`, `models.json`, `agents/`, `skills/`, `lib/`, and `extensions/harness.ts` from that directory for this process and all children. The subagent package reads its own config from `extensions/subagent/config.json` in the same agent directory. `auth.json`, `sessions/`, `models-store.json`, and `npm/` are ignored by the included `.gitignore`.
+Launch from any project. Pi reads `settings.json`, `models.json`, `agents/`, `skills/`, and `extensions/harness.ts` from that directory. The local extension applies to the primary run only; every subagent file sets `extensions:` empty, which keeps ambient extensions, including the harness extension, out of children. The subagent package reads its own config from `extensions/subagent/config.json` in the same agent directory. `auth.json`, `sessions/`, `models-store.json`, and `npm/` are ignored by the included `.gitignore`.
 
 ## Roles
 
@@ -26,14 +26,14 @@ The package catalog advertises exactly the four configured agents. Built-in pack
 
 | Agent | Model | Tools |
 |---|---|---|
-| thinker | opencode/claude-opus-5-5 | read, grep, find, ls, git |
+| thinker | opencode/claude-opus-5-5 | read, grep, find, ls |
 | doer | isoquant/glm-5.3-flash (thinking max) | read, bash, edit, write, grep, find, ls |
-| reviewer | opencode/gpt-6.1-sol | read, grep, find, ls, git |
+| reviewer | opencode/gpt-6.1-sol | read, grep, find, ls |
 | ui-designer | opencode/gpt-5.6-terra | read, grep, find, ls |
 
 Descriptions reuse the original harness agent definitions. Launch natively, for example `subagent({ agent: "thinker", task: "..." })`. With workflow scripts disabled, `tasks: [{ agent, task }, ...]` still runs children in parallel and returns their results in order.
 
-Children run foreground (`asyncByDefault: false`) with fresh context (`defaultSubagentContext: fresh`, depth 1). Each agent file opts explicitly into `systemPromptMode: append` plus project context, global context, and the discovered skills catalog, so every inherited context is a declared frontmatter choice rather than a default. Nested delegation is blocked (`allowNestedSubagents: false`). The `doer` declares `thinking: max` in its frontmatter, matching the model-level pin in `settings.json`.
+Children run in the background by default (`asyncByDefault: true`) with fresh context (`defaultSubagentContext: fresh`, depth 1). Each agent file opts explicitly into `systemPromptMode: append` plus project context, global context, and the discovered skills catalog, so every inherited context is a declared frontmatter choice rather than a default. Nested delegation is blocked (`allowNestedSubagents: false`). The `doer` declares `thinking: max` in its frontmatter, matching the model-level pin in `settings.json`.
 
 The primary prompt routes work to `thinker`, `doer`, and `reviewer` by name, so no change to the copied prompt body was needed for the switch.
 
@@ -50,13 +50,9 @@ Missions stay off through `disabledFeatures` and `missions.enabled: false` in `e
 
 After changing the extension or the primary prompt, run `/reload` in Pi. Launch with `PI_CODING_AGENT_DIR` set as shown above because Pi does not treat this repository's root as its agent directory just because it is the working directory.
 
-## Child-only extension and guards
+## Trust and run visibility
 
-`lib/child.ts` is the only extension children load. Every agent file lists it explicitly, which also keeps ambient extensions out of children. It registers the path guard and a read-only `git` tool with fixed `status`, `diff`, and `log` views, the combined staged and unstaged diff against HEAD with separate index and working-tree comparisons in repositories without commits, UTF-8 output capped with explicit truncation notices, and cancellation listener cleanup. The parent imports `registerPathGuard` from the same module. The package's strict tool allowlist exposes `git` only to the roles that list it.
-
-The guard blocks `~/.aws` for every role's read, write, edit, grep, find, and ls calls and for the git tool's directory. Listing or searching rooted at `~/github` itself is blocked for grep, find, and ls, while project subdirectories under `~/github` stay readable. Paths expand `~`, resolve relative paths against the working directory, and resolve symlinks through the real path of the existing target or the nearest existing ancestor for writes.
-
-These checks are best-effort tool guards and not a sandbox. Bash remains unrestricted for the primary and the doer, and a shell command can bypass every guard. Project repositories can add trusted agent definitions through the package's discovery scopes, and loading them is a trust decision, not a security boundary. The Hunk review skill requires shell access, so it cannot function in read-only roles. Active runs are visible in the package's FleetView instead of a custom status counter.
+Project repositories can add trusted agent definitions through the package's discovery scopes, and loading them is a trust decision. The Hunk review skill requires shell access, so it cannot function in read-only roles. Active runs are visible in the package's FleetView instead of a custom status counter.
 
 ## Files
 
@@ -65,10 +61,9 @@ settings.json                      defaults, tool selection, thinking levels, bu
 models.json                        isoquant provider (with GLM developer-role compat pin) and GovCloud Bedrock model
 agents/                            primary body plus four subagent definitions with model/tools frontmatter
 skills/                            brand-guidelines, good-documentation, hunk-review, ux-intake
-extensions/subagent/config.json    tool activation eager, foreground children, fresh context, depth 1, schedules off, missions off, intercom off
-lib/child.ts                       path guard and readonly git tool (child extension)
-extensions/harness.ts              primary prompt hook, input suffix, guard registration
-test/                              VM-based tests for guard, git, and parent prompt handling plus the loopback serialization test
+extensions/subagent/config.json    tool activation eager, background children by default, fresh context, depth 1, schedules off, missions off, intercom off
+extensions/harness.ts              primary prompt hook and input suffix
+test/                              VM-based tests for parent prompt handling plus the loopback serialization test
 ```
 
 The pinned package's skills and prompts are excluded in the `settings.json` package entry, so only the tracked `skills/` directory applies. Built-in MCP, codemode, and tool search stay disabled through resource exclusions. The provider details for `opencode` and the `isoquant` endpoint, the `Isoquant-ZDR: required` header, and the GovCloud Bedrock entry are otherwise unchanged. `models.json` carries the catalog values, and authentication uses the matching API keys or `/login`.
@@ -87,7 +82,7 @@ Run the suite without installing anything.
 node --experimental-vm-modules /home/alex/github/pi-config/test/harness.test.mjs
 ```
 
-The suite loads the real `lib/child.ts` and `extensions/harness.ts` sources into a VM with mocked framework imports and covers the path guard against symlink fixtures, the git tool against real temporary repositories, and the parent prompt paths including the catalog-composition case. It does not load the installed package, launch Pi, or call a model.
+The suite loads the real `extensions/harness.ts` source into a VM with mocked framework imports and covers the parent prompt paths including the catalog-composition case. It does not load the installed package, launch Pi, or call a model.
 
 The loopback test is separate. It launches the real Pi binary against a local HTTP server and sends no requests to real models or installed folders. It needs a Pi install reachable through `PATH` or through `PI_BINARY` set to a command or path.
 

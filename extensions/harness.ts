@@ -2,7 +2,6 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { getAgentDir } from "@earendil-works/pi-coding-agent";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { registerPathGuard } from "../lib/child.ts";
 
 const PRIMARY_SUFFIX = "\n\nRespond in natural, plain English with complete sentences.";
 
@@ -22,8 +21,6 @@ export default function (pi: ExtensionAPI) {
 		// rides the explicit override instead of being silently dropped.
 		return { systemPrompt: `${event.systemPrompt}\n\n${primaryPrompt}` };
 	});
-
-	registerPathGuard(pi);
 
 	pi.on("input", (event) => {
 		if (event.source === "extension") return { action: "continue" };

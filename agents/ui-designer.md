@@ -10,7 +10,7 @@ inheritGlobalContext: true
 inheritSkills: true
 defaultContext: fresh
 allowNestedSubagents: false
-extensions: ../lib/child.ts
+extensions:
 ---
 
 Act as a senior product designer conducting a rigorous UI and UX review.
